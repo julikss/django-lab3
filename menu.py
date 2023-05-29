@@ -79,7 +79,7 @@ class DecanatMenu(tk.Tk):
                         error = True
                     
                 if error == False:
-                    mongodb.create(data)
+                    mongodb.create(1, data)
                     self.table.insert("", tk.END, values=data)
                     self.win.destroy()
                 else:
@@ -154,6 +154,36 @@ class DecanatMenu(tk.Tk):
             self.add_btn = tk.Button(self.win_edit, text="Оновити", command=update_student)
             self.add_btn.grid(row=6, column=0, columnspan=2, padx=20, pady=10, ipadx=100)
 
+
+        def open_next_table():
+            self.win = tk.Tk()
+            self.win.title('Table without subjects')
+            self.win.geometry("600x350")
+            self.win['bg'] = '#DFF0E9'
+
+            #creating table
+            self.table = ttk.Treeview(self.win)
+            self.table['columns']= ('id', 'course','group', 'student')
+            self.table.column("#0", width=0,  stretch=tk.NO)
+            self.table.column("id", anchor=tk.CENTER, width=80)
+            self.table.column("course", anchor=tk.CENTER, width=50)
+            self.table.column("group", anchor=tk.CENTER, width=50)
+            self.table.column("student", anchor=tk.CENTER, width=200)
+
+            self.table.heading("id",text="ID студента")
+            self.table.heading("course",text="Курс")
+            self.table.heading("group",text="Група")
+            self.table.heading("student",text="Прізвище та ім'я студента")
+            self.table.pack(pady=15)
+
+            #counter for number of records
+            self.count = 0
+            records1 = mongodb.read()
+            for row in records1:
+                mongodb.create(2, row[:4])
+                self.table.insert("", tk.END, values=row[:4])
+                self.count+=1   
+
         #function for deleting
         def delete_student():
             selected = self.table.selection()
@@ -168,7 +198,9 @@ class DecanatMenu(tk.Tk):
         self.but_update.pack(pady=2, ipadx=59)
         self.but_delete = tk.Button(text="Видалити студента з бази", command=delete_student)
         self.but_delete.pack(pady=2, ipadx=50) 
-
+        self.but_sqlite = tk.Button(text="Відкрити наступну таблицю", command=open_next_table)
+        self.but_sqlite.pack(pady=2, ipadx=50) 
+         
 if __name__ == "__main__":
     app = DecanatMenu()
     app.mainloop()

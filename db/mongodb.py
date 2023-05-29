@@ -18,12 +18,13 @@ class MongoDB():
             print("Couldn't connect...")
 
     def create_collection(self):
-        self.collection = self.db['students']
-        self.collection.delete_many({})
+        self.collection1 = self.db['students']
+        self.collection2 = self.db['students_without_subjects']
+        self.collection1.delete_many({})
         self.fill_with_example_values()
 
     def fill_with_example_values(self):
-        self.collection.insert_many(example_students)
+        self.collection1.insert_many(example_students)
 
     def get_student(self, id):
         data = self.read()
@@ -32,7 +33,7 @@ class MongoDB():
                 return el
        
     def read(self):
-        data = list(self.collection.find())
+        data = list(self.collection1.find())
         
         result = []
         for el in data:
@@ -41,14 +42,18 @@ class MongoDB():
            
         return result
 
-    def create(self, data):
-        self.collection.insert_one({'course': data[0], 'group_name': data[1], 'student': data[2], 'subject': data[3]})
+    def create(self, table, data):
+        if (table == 1): 
+            collection = self.collection1
+        else: 
+            collection = self.collection2
+        collection.insert_one({'course': data[0], 'group_name': data[1], 'student': data[2], 'subject': data[3]})
 
     def update(self, data):
-        self.collection.update_one({'_id': data[0]}, {'$set': {'course': data[1], 'group_name': data[2], 'student': data[3], 'subject': data[4]}})
+        self.collection1.update_one({'_id': data[0]}, {'$set': {'course': data[1], 'group_name': data[2], 'student': data[3], 'subject': data[4]}})
 
     def delete(self, id):
-        self.collection.delete_one({'_id': id})
+        self.collection1.delete_one({'_id': id})      
 
     def __del__(self):
         self.client.close()
